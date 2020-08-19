@@ -1,0 +1,13 @@
+{
+  "name": "discord-riggs",
+  "version": "1.0.0",
+  "description": "Director Riggs Bot for Discord",
+  "main": "index.js",
+  "author": "Sprintermax",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^12.3.1",
+    "dotenv": "^8.2.0",
+    "mongodb": "^3.6.0"
+  }
+}
