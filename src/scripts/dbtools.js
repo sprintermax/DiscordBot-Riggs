@@ -7,27 +7,40 @@ module.exports.checkcfg = async (client, message) => {
             if (guilddb) {
                 resolve(guilddb);
             } else {
-                CreateDefaultCfg(client, message);
+                console.log(`[INFO] Criando database para o servidor "${message.guild.name}" (${message.guild.id})`);
+                const defaultcfg = {
+                    "guildid": message.guild.id,
+                    "prefix": "",
+                    "chatids": {
+                        "actionlog": "",
+                        "wordslog": "",
+                        "autoshop": ""
+                    },
+                    "leveling": [
+                        {
+                            "userid": "",
+                            "userxp": ""
+                        }
+                    ],
+                    "economy": [
+                        {
+                            "userid": "",
+                            "balance": ""
+                        }
+                    ],
+                    "config": {
+                        "actionlog": "off",
+                        "wordslog": "off",
+                        "wordfilter": "off",
+                        "autoshop": "off",
+                        "leveling": "off",
+                        "economy": "off"
+                    },
+                    "badwords": []
+                };
+                db.updateOne({ "DBNameID":"RiggsDB" }, { $push: { guilds: defaultcfg } });
+                resolve(defaultcfg);
             }
         });
     });
 };
-
-function CreateDefaultCfg(client, message) {
-    console.log(`Criando database para o servidor "${message.guild.name}" (${message.guild.id})`);
-    const changes = {
-        "guildid": message.guild.id,
-        "prefix": "",
-        "chatids": {
-            "actionlog": "",
-            "wordslog": ""
-        },
-        "config": {
-            "actionlog": "disabled",
-            "words": "disabled",
-            "wordfilter": "disabled"
-        },
-        "badwords": []
-    }
-    db.updateOne({ "DBNameID":"RiggsDB" }, { $push: { guilds: changes } });
-}
