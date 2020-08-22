@@ -40,14 +40,13 @@ module.exports.rank = async (ERR_ID, cmddata, client, message, args, guilddb) =>
             ranktext += `${rankpos}- <@${cmddata[rankpos-1].userid}>: ${cmddata[rankpos-1].userxp} EXP\n`;
             ranksize -= 1;
         }
-        
         embedresponse = {
             "title": "Rank de Experiência do Servidor",
             "description": ranktext,
             "color": 5407405,
             "timestamp": new Date(),
             "footer": {
-              "icon_url": `${message.guild.iconURL()}`,
+              "icon_url": `${message.guild.iconURL() || ""}`,
               "text": `${message.guild.name}`
             }
           }

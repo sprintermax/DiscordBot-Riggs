@@ -3,11 +3,10 @@ const cmdresponse = require(`../scripts/cmdresponse.js`);
 module.exports.run = async (client, message, args, guilddb) => {
     if (guilddb.hasOwnProperty('config')) {
         if (guilddb.config.hasOwnProperty('leveling') && guilddb.config.leveling == "on") {
-
-            if (guilddb.hasOwnProperty('leveling')) {
+            if (guilddb.hasOwnProperty('levels')) {
                 if (args.length > 0) return cmdresponse.rank("RANK_MORE_ARGS", "", client, message, args, guilddb);
 
-                const rankedusers = guilddb.leveling;
+                const rankedusers = guilddb.levels;
 
                 rankedusers.sort(function(b, a){
                     const useraxp = a.userxp;
