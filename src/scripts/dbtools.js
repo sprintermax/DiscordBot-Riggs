@@ -3,8 +3,12 @@ module.exports.getguilddb = async (client, message) => {
         const db = client.botdb;
         var guilddb = await db.findOne({"DBGuildID": message.guild.id});
         if (!guilddb) {
-            db.insertOne({"DBGuildID": message.guild.id})
-            resolve({"DBGuildID": message.guild.id});
+            const newguild = {
+                "DBGuildID": message.guild.id,
+                "prefix": "r!"
+            };
+            db.insertOne(newguild)
+            resolve(newguild);
         } else {
             resolve(guilddb);
         }

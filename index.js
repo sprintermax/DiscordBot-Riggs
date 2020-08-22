@@ -7,8 +7,6 @@ const fs = require(`fs`);
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 
-client.defaultcfg = require(`./src/defaultcfg.json`);
-
 fs.readdir("./src/events/", (err, files) => {
     console.log('[INFO] Importação dos eventos iniciada.');
     if (err) return console.error(err);
