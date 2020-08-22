@@ -46,11 +46,11 @@ mongo.connect(process.env.MONGO_DATABASE, {
 	useNewUrlParser: true,
 	useUnifiedTopology: true
 }, (err, mongodb) => {
-	db = mongodb.db("RiggsDatabase").collection("StoredData");
-	if (err) return console.error(err);
+    if (err) return console.error(err);
+    db = mongodb.db("RiggsDatabase").collection("StoredData");
 	client.botdb = db;
-	db.find({"DBNameID":"RiggsDB"}).toArray((err, items) => {
-        client.dbdata = items[0];
+	db.find({"DBNameID":"GeneralData"}).toArray((err, items) => {
+        client.botdata = items[0];
 		client.login(process.env.DISCORD_TOKEN);
 	});
 });
