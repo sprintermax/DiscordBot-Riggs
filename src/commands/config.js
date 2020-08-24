@@ -3,7 +3,7 @@ const cmdresponse = require(`../scripts/cmdresponse.js`);
 module.exports.run = async (client, message, args, guilddb) => {
     const db = client.botdb;
 	if (!message.member.hasPermission("MANAGE_GUILD")) return cmdresponse.config("NO_PERM_MANAGE_GUILD", "", client, message, args, guilddb);
-    if (args.length < 1) return cmdresponse.config("GERAL_INVALID_CMD", "", client, message, args, guilddb);
+    if (args.length < 1) return cmdresponse.config("CONFIG_NO_ARGS", "", client, message, args, guilddb);
 
     if (args[0] == "prefix") {
         if (args.length < 2) return cmdresponse.config("PREFIX_NO_ARGS", "", client, message, args, guilddb);

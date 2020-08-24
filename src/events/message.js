@@ -1,6 +1,8 @@
 const DBTools = require(`../scripts/dbtools.js`);
 const Leveling = require(`../modules/leveling.js`);
 
+const XPCoolDown = new Set();
+
 module.exports = (client, message) => {
 	if (message.author.bot || !message.guild) return;
 
@@ -8,7 +10,13 @@ module.exports = (client, message) => {
 
 		if (guilddb.hasOwnProperty('config')) {
 			if ((message.content.indexOf(guilddb.prefix) !== 0)) {
+				
 				if (guilddb.config.hasOwnProperty('leveling') && guilddb.config.leveling == "on") {
+					if (XPCoolDown.has(message.author.id)) return;
+					XPCoolDown.add(message.author.id);
+					setTimeout(() => {
+						XPCoolDown.delete(message.author.id);
+					}, 30000);
 					Leveling.run(client, message, guilddb);
 				}
 				/*if (guilddb.config.hasOwnProperty('economy') && guilddb.config.economy == "on") {

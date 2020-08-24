@@ -5,7 +5,6 @@ module.exports.run = async (client, message, guilddb) => {
         "DBGuildID": message.guild.id,
         "levels.userid": message.author.id
     });
-
     if (userlevel) {
         const userindex = userlevel.levels.findIndex(index => index.userid == message.author.id)
         var newexp = userlevel.levels[userindex].userxp + 3
