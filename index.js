@@ -45,7 +45,7 @@ mongo.connect(process.env.MONGO_DATABASE, {
 	useUnifiedTopology: true
 }, (err, mongodb) => {
     if (err) return console.error(err);
-    db = mongodb.db("RiggsDatabase").collection("StoredData");
+    db = mongodb.db("BotFlixDatabase").collection("StoredData");
 	client.botdb = db;
 	db.find({"DBNameID":"GeneralData"}).toArray((err, items) => {
         client.botdata = items[0];
