@@ -9,7 +9,7 @@ module.exports.run = async (client, message, args, guilddb) => {
             if (args.length < 1) return cmdresponse.levelcfg("LEVELCFG_INVALID_CMD", "", client, message, args, guilddb);
             if (args[0] == "set") {
                 if (args.length < 3) return cmdresponse.levelcfg("LEVELCFG_SET_NO_ARGS", "", client, message, args, guilddb);
-                var user = GetUser(client, args[1]);
+                var user = client.users.cache.get(args[1].replace(/[<@!>]/g, ''));
                 if (!user) return cmdresponse.levelcfg("LEVELCFG_INVALID_USER", args[1], client, message, args, guilddb);
                 if (args[2] == parseInt(args[2], 10) && args[2] >= 0) {
                     db.findOne({
@@ -36,7 +36,7 @@ module.exports.run = async (client, message, args, guilddb) => {
                 } else return cmdresponse.levelcfg("LEVELCFG_INVALID_NUMBER", args[2], client, message, args, guilddb);
             } else if (args[0] == "add") {
                 if (args.length < 3) return cmdresponse.levelcfg("LEVELCFG_ADD_NO_ARGS", "", client, message, args, guilddb);
-                var user = GetUser(client, args[1]);
+                var user = client.users.cache.get(args[1].replace(/[<@!>]/g, ''));
                 if (!user) return cmdresponse.levelcfg("LEVELCFG_INVALID_USER", args[1], client, message, args, guilddb);
                 if (args[2] == parseInt(args[2], 10) && args[2] >= 0) {
                     db.findOne({
@@ -65,7 +65,7 @@ module.exports.run = async (client, message, args, guilddb) => {
                 } else return cmdresponse.levelcfg("LEVELCFG_INVALID_NUMBER", args[2], client, message, args, guilddb);
             } else if (args[0] == "rem") {
                 if (args.length < 3) return cmdresponse.levelcfg("LEVELCFG_REM_NO_ARGS", "", client, message, args, guilddb);
-                var user = GetUser(client, args[1]);
+                var user = client.users.cache.get(args[1].replace(/[<@!>]/g, ''));
                 if (!user) return cmdresponse.levelcfg("LEVELCFG_INVALID_USER", args[1], client, message, args, guilddb);
                 if (args[2] == parseInt(args[2], 10) && args[2] >= 0) {
                     db.findOne({
@@ -86,7 +86,7 @@ module.exports.run = async (client, message, args, guilddb) => {
                     });
                 } else return cmdresponse.levelcfg("LEVELCFG_INVALID_NUMBER", args[2], client, message, args, guilddb);
             } else if (args[0] == "resetall") {
-                message.channel.send(`${message.author} Esta ação irá redefinir a Experiência de TODOS do servidor, tem certeza que quer fazer isso?`).then(msg => {
+                message.channel.send(`${message.author} Esta ação irá redefinir a Experiência de TODOS do servidor e NÃO poderá ser desfeita, tem certeza que quer fazer isso?`).then(msg => {
                     msg.react("❌").then(() => {
                         msg.react("✅");
                     });
@@ -96,19 +96,21 @@ module.exports.run = async (client, message, args, guilddb) => {
                     msgreact.on('collect', r => {
                         isreacted = 1;
                         if (r.emoji.name == "✅") {
+                            msgreact.stop();
                             db.updateOne({ "DBGuildID": message.guild.id }, { $unset: { "levels": [] } } );
-                            msg.delete().then(() => {
-                                message.channel.send(`${message.author} Pronto! Redefini a Experiência de Todos do servidor.`)
+                            msg.reactions.removeAll().then(() => {
+                                msg.edit(`${message.author} Pronto! Redefini a Experiência de Todos do servidor.`);
                             });
-                        } else if (r.emoji.name = "❌") {
-                            msg.delete().then(() => {
-                                message.channel.send(`${message.author} Redefinição de Experiência cancelada.`)
+                        } else if (r.emoji.name == "❌") {
+                            msgreact.stop();
+                            msg.reactions.removeAll().then(() => {
+                                msg.edit(`${message.author} Redefinição de Experiência cancelada.`);
                             });
                         }
                     });
                     msgreact.on('end', () => {
-                        if (isreacted = 0) msg.delete().then(() => {
-                            message.channel.send(`${message.author} Tempo limite de resposta atingido, redefinição de Experiência cancelada.`)
+                        if (isreacted == 0) msg.reactions.removeAll().then(() => {
+                            msg.edit(`${message.author} Tempo limite de resposta atingido, redefinição de Experiência cancelada.`);
                         });
                     });
                 });
@@ -116,12 +118,3 @@ module.exports.run = async (client, message, args, guilddb) => {
         } else return cmdresponse.levelcfg("LEVELCFG_LEVELING_DISABLED", "", client, message, args, guilddb);
     } else return cmdresponse.levelcfg("LEVELCFG_LEVELING_DISABLED", "", client, message, args, guilddb);
 };
-
-function GetUser(client, mention) {
-    if (!mention) return;
-    if (mention.startsWith('<@') && mention.endsWith('>')) {
-        mention = mention.slice(2, -1);
-        if (mention.startsWith('!')) mention = mention.slice(1);
-    }
-    return client.users.cache.get(mention);
-}
