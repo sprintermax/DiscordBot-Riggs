@@ -17,8 +17,13 @@ module.exports.run = async (client, message, args, guilddb) => {
         "icon_url": `${message.guild.iconURL() || ""}`,
         "text": `${message.guild.name}`
     };
-    perfil.thumbnail.url = "https://cdn.discordapp.com/avatars/307331927772364801/2374268661032a2cb796d3c8b1b0503c.webp?size=1024";
+    perfil.thumbnail.url = member.user.avatarURL();
 
+
+    console.log(db.findOne({
+        "DBGuildID": message.guild.id,
+        "levels.userid": member.user.id
+    }))
 
 
     if ("description" == 1) perfil.description = "**Nota:** Pode ser bobão mas é muito legal, porém costuma mandar muitas prints nos chats\n- <@217808091343749121>, 26/08/2020 às 10:02";

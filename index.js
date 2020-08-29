@@ -47,7 +47,7 @@ mongo.connect(process.env.MONGO_DATABASE, {
     if (err) return console.error(err);
     db = mongodb.db("BotFlixDatabase").collection("StoredData");
 	client.botdb = db;
-	db.find({"DBNameID":"GeneralData"}).toArray((err, items) => {
+	db.find({"DBNameID":"GlobalData"}).toArray((err, items) => {
         client.botdata = items[0];
 		client.login(process.env.DISCORD_TOKEN);
 	});

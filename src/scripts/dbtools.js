@@ -5,7 +5,10 @@ module.exports.getguilddb = async (client, message) => {
         if (!guilddb) {
             const newguild = {
                 "DBGuildID": message.guild.id,
-                "prefix": "r!"
+                "prefix": "r!",
+                "config": {},
+                "profiles": [],
+                "badwords": []
             };
             db.insertOne(newguild)
             resolve(newguild);
