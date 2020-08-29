@@ -53,7 +53,8 @@ module.exports.rank = async (ERR_ID, cmddata, client, message, args, guilddb) =>
         ranksize = Math.min(cmddata.length, 10);
         while (ranksize > 0) {
             rankpos += 1;
-            ranktext += `${rankpos}- <@${cmddata[rankpos-1].userid}>: ${cmddata[rankpos-1].userxp} EXP\n`;
+            // if (rankpos == 4) ranktext += "\n";
+            ranktext += `${rankpos}- <@${cmddata[rankpos-1].userid}>: ${cmddata[rankpos-1].experience} EXP\n`;
             ranksize -= 1;
         }
         embedresponse = {

@@ -1,25 +1,29 @@
 module.exports.run = async (client, message, guilddb) => {
     const db = client.botdb;
-
-    var userlevel = await db.findOne({
+    var newexp;
+    var profiledb = await db.findOne({
         "DBGuildID": message.guild.id,
-        "levels.userid": message.author.id
+        "profiles.userid": message.author.id
     });
-    if (userlevel) {
-        const userindex = userlevel.levels.findIndex(index => index.userid == message.author.id)
-        var newexp = userlevel.levels[userindex].userxp + 3
+    if (profiledb) {
+        const userindex = profiledb.profiles.findIndex(index => index.userid == message.author.id)
+        if (!profiledb.profiles[userindex].experience) {
+            newexp = 3;
+        } else {
+            newexp = profiledb.profiles[userindex].experience + 3;
+        }
         db.updateOne({
             "DBGuildID": message.guild.id,
-            "levels.userid": message.author.id
+            "profiles.userid": message.author.id
         },
-        { $set: { "levels.$.userxp": newexp } } );
+        { $set: { "profiles.$.experience": newexp } } );
     } else {
         db.updateOne({
             "DBGuildID": message.guild.id
         },
-        { $push: { "levels": {
+        { $push: { "profiles": {
             "userid" : message.author.id,
-            "userxp" : 3
+            "experience" : 3
         } } } );
     }
 };
