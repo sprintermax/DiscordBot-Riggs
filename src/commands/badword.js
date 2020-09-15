@@ -2,7 +2,6 @@ const cmdresponse = require(`../scripts/cmdresponse.js`);
 
 module.exports.run = async (client, message, args, guilddb) => {
     const db = client.botdb;
-    if (guilddb.hasOwnProperty('config')) {
         if (guilddb.config.hasOwnProperty('badword') && guilddb.config.badword == "on") {
             if (!message.member.hasPermission("MANAGE_MESSAGES")) return cmdresponse.badword("BADWORD_NO_PERM_MANAGE_MESSAGES", "", client, message, args, guilddb);
             if (args.length < 1) return cmdresponse.badword("BADWORD_NO_ARGS", "", client, message, args, guilddb);
@@ -41,5 +40,4 @@ module.exports.run = async (client, message, args, guilddb) => {
                 } else return cmdresponse.badword("BADWORD_REM_BLANK_DB", "", client, message, args, guilddb);
             }
         } else return cmdresponse.badword("BADWORD_BADWORD_DISABLED", "", client, message, args, guilddb);
-    } else return cmdresponse.badword("BADWORD_BADWORD_DISABLED", "", client, message, args, guilddb);
 }

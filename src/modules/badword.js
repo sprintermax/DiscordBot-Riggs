@@ -22,7 +22,8 @@ module.exports.run = async (client, message, guilddb) => {
 			.addField('🚫 Contéudo inapropriado da mensagem:', badword)
 			.addField('💬 Onde ocorreu e quem enviou:', `Mensagem enviada por ${message.author} no chat ${message.channel}`)
 			.setFooter(message.guild.name, message.guild.iconURL() || "");
-        const logchannel = message.guild.channels.cache.get(guilddb.config.badwordlog);
+		const logchannel = message.guild.channels.cache.get(guilddb.config.badwordlog);
+		if (!logchannel) return;
         if (logchannel.permissionsFor(message.guild.me).has('VIEW_CHANNEL') && logchannel.permissionsFor(message.guild.me).has('SEND_MESSAGES')) {
             logchannel.send(embed);
         } else {

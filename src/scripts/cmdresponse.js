@@ -96,7 +96,7 @@ module.exports.levelcfg = async (ERR_ID, cmddata, client, message, args, guilddb
 module.exports.moneycfg = async (ERR_ID, cmddata, client, message, args, guilddb) => {
     if (ERR_ID == "NO_PERM_BAN_MEMBERS") {
         message.channel.send(`${message.author} você não tem permissão para usar esse comando! a permissão que precisa é: banir membros`)
-    } else if (ERR_ID == "MONEYCFG_LEVELING_DISABLED") {
+    } else if (ERR_ID == "MONEYCFG_ECONOMY_DISABLED") {
         message.channel.send(`${message.author} O módulo de economia está desativado nesse servidor.`)
     } else if (ERR_ID == "MONEYCFG_INVALID_CMD") {
         message.channel.send(`${message.author} use set, add, rem ou reset`)
@@ -129,8 +129,8 @@ module.exports.money = async (ERR_ID, cmddata, client, message, args, guilddb) =
         ranksize = Math.min(cmddata.length, 10);
         while (ranksize > 0) {
             rankpos += 1;
-            if (cmddata[rankpos-1].userid) ranktext += `${rankpos}- <@${cmddata[rankpos-1].userid}>: $${cmddata[rankpos-1].usermoney}\n`;
-            if (cmddata[rankpos-1].bankuser) banktext = `\nQuantia adquirida pelo Banco com taxas: $${cmddata[rankpos-1].usermoney}`
+            if (cmddata[rankpos-1].userid) ranktext += `${rankpos}- <@${cmddata[rankpos-1].userid}>: $${cmddata[rankpos-1].money}\n`;
+            if (cmddata[rankpos-1].bankuser) banktext = `\nQuantia adquirida pelo Banco com taxas: $${cmddata[rankpos-1].money}`
             ranksize -= 1;
         }
         ranktext += banktext;
@@ -192,5 +192,7 @@ module.exports.perfil = async (ERR_ID, cmddata, client, message, args, guilddb) 
         message.channel.send(`${message.author} "${cmddata}" é inválido. Você precisa especificar algum usuário desse servidor.`)
     } else if (ERR_ID == "PERFIL_USER_BOT") {
         message.channel.send(`${message.author} Oops! Parece que você mencionou um Bot, infelizmente somente membros reais podem ter um perfil.`)
+    } else if (ERR_ID == "PERFIL_USER_NO_DATA") {
+        message.channel.send(`${message.author} Desculpe, mas não tenho informações o suficiente sobre esse usuário para montar um perfil`)
     }
 };

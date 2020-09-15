@@ -1,17 +1,48 @@
 const cmdresponse = require(`../scripts/cmdresponse.js`);
 
 module.exports.run = async (client, message, args, guilddb) => {
-    var member;
+    var member, money, experience, profileviewcount;
     var perfil = {
         thumbnail: {},
         fields: []
     };
     if (args.length < 1) member = message.guild.members.cache.get(message.author.id);
-    if (args.length == 1) member = message.guild.members.cache.get(args[0].replace(/[<@!>]/g, ''));
-    if (!member) return cmdresponse.perfil("PERFIL_INVALID_USER", args[1], client, message, args, guilddb);
+    if (args.length >= 1) member = message.guild.members.cache.get(args[0].replace(/[<@!>]/g, ''));
+    if (!member) return cmdresponse.perfil("PERFIL_INVALID_USER", args[0], client, message, args, guilddb);
     if (member.user.bot) return cmdresponse.perfil("PERFIL_USER_BOT", "", client, message, args, guilddb);
-    
-    perfil.title = `Perfil de ${member.displayName} | ${"viewssize"} Visualizações`;
+
+    if (args[0] && member.user.id != message.author.id) {
+        db.findOne({
+            "DBGuildID": message.guild.id,
+            "profiles.userid": member.user.id
+        }).then(data => {
+            if (data) {
+                const userindex = data.profiles.findIndex(index => index.userid == member.user.id);
+                if (data.profiles[userindex].profileviewcount) {
+                    db.updateOne({
+                        "DBGuildID": message.guild.id,
+                        "profiles.userid": member.user.id
+                    },
+                    { $set: { "profiles.$.profileviewcount": parseInt(data.profiles[userindex].profileviewcount, 10) + 1 } } );
+                } else {
+                    db.updateOne({
+                        "DBGuildID": message.guild.id,
+                        "profiles.userid": member.user.id
+                    },
+                    { $set: { "profiles.$.profileviewcount": 1 } } );
+                }
+            } else {
+                db.updateOne({
+                    "DBGuildID": message.guild.id
+                },
+                { $push: { "profiles": {
+                    "userid" : member.user.id,
+                    "profileviewcount" : 1
+                } } } );
+            }
+        });
+    }
+
     perfil.timestamp = new Date();
     perfil.footer = {
         "icon_url": `${message.guild.iconURL() || ""}`,
@@ -19,69 +50,64 @@ module.exports.run = async (client, message, args, guilddb) => {
     };
     perfil.thumbnail.url = member.user.avatarURL();
 
-
-    console.log(db.findOne({
+    db.findOne({
         "DBGuildID": message.guild.id,
-        "levels.userid": member.user.id
-    }))
+        "profiles.userid": member.user.id
+    }).then(data => {
+        if (!data) return cmdresponse.perfil("PERFIL_USER_NO_DATA", "", client, message, args, guilddb);
+        const userindex = data.profiles.findIndex(index => index.userid == member.user.id)
 
+        if (data.profiles[userindex].profileviewcount) {
+            profileviewcount = `${data.profiles[userindex].profileviewcount}`;
+        } else profileviewcount = 0;
 
-    if ("description" == 1) perfil.description = "**Nota:** Pode ser bobão mas é muito legal, porém costuma mandar muitas prints nos chats\n- <@217808091343749121>, 26/08/2020 às 10:02";
+        perfil.title = `Perfil de ${member.displayName} | ${profileviewcount} Visualizações`;
     
-    if ("biografia" == 1) perfil.fields.push({
-        "name": "Biografia:",
-        "value": "Olá, eu gosto de ursas e adoro conversar, também distribuo agraços gratuitos para quem me pede sempre que eu estiver on-line :3"
-    });
+        
+        if (data.profiles[userindex].description) {
+            perfil.description = data.profiles[userindex].description
+        }
 
+        if (data.profiles[userindex].biografia) {
+            perfil.fields.push({
+                "name": "Biografia:",
+                "value": data.profiles[userindex].biografia
+            });
+        }
+        
+        if ( guilddb.config.hasOwnProperty('leveling') 
+        && guilddb.config.leveling == "on" 
+        && data.profiles[userindex].experience) {
+            experience = data.profiles[userindex].experience;
+        } else experience = 0;
+        perfil.fields.push({
+            "name": "Experiência:",
+            "value": `${experience} EXP`,
+            "inline": true
+        });
 
+        if (guilddb.config.hasOwnProperty('economy') 
+        && guilddb.config.economy == "on" 
+        && data.profiles[userindex].money) {
+            money = data.profiles[userindex].money;
+        } else money = 0;
+        perfil.fields.push({
+            "name": "Carteira:",
+            "value": `$${money}`,
+            "inline": true
+        });
 
-    if ("experiencia") expvalue = "432426"; else expvalue = 0;
-    perfil.fields.push({
-        "name": "Experiência:",
-        "value": `${expvalue} EXP`,
-        "inline": true
-    });
-    
-    if ("carteira") moneyvalue = "7453271"; else moneyvalue = 0;
-    perfil.fields.push({
-        "name": "Carteira:",
-        "value": `$${moneyvalue}`,
-        "inline": true
-    });
+        if (data.profiles[userindex].emblemas && data.profiles[userindex].emblemas.length > 0) {
+            perfil.fields.push({
+                "name": "Emblemas:",
+                "value": `\`\"${data.profiles[userindex].emblemas.join("`, `")}\"\``
+            });
+        }
 
-
-
-    if ("emblemas") perfil.fields.push({
-        "name": "Emblemas:",
-        "value": "`\"Emblema 1\"`, `\"Emblema 2\"`, `\"Emblema 3\"`, `\"Emblema 4\"`"
-    });
-
-
-    message.channel.send(`${message.author} Aqui está:`, {
-        embed: perfil
-    });
-    const emblemafield = perfil.fields.findIndex(index => index.name == "Emblemas:")
-    console.log(perfil)
-    console.log(emblemafield >= 0 ? "found" : "not found")
-    
-    
-    
-    return
-    var user = "<@!12345678 teste mensagem tamanho9>" //Just assuming that's their user id.
-            var userID = user.replace(/[<@!>]/g, '');
-            console.log(userID)
-            console.log(userID.length)
-    if (guilddb.config.hasOwnProperty('leveling') && guilddb.config.leveling == "on") {
-        if (args.length < 1) {
-            
-            
-            var user = "<@!123456789>" //Just assuming that's their user id.
-            var userID = user.replace(/[<@!>]/g, '');
-            console.log(userID)
-
-
-        } else if (args.length == 1) {
-            //mention
-        } //else return cmdresponse.config("RANK_MORE_ARGS", "", client, message, args, guilddb);
-    } //else return cmdresponse.config("RANK_LEVELING_DISABLED", "", client, message, args, guilddb);
+        message.channel.send(`${message.author} Aqui está:`, {
+            embed: perfil
+        });
+    })
+    //const emblemafield = perfil.fields.findIndex(index => index.name == "Emblemas:")
+    //console.log(emblemafield >= 0 ? "found" : "not found")
 };

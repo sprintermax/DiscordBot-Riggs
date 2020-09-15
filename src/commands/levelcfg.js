@@ -5,11 +5,11 @@ module.exports.run = async (client, message, args, guilddb) => {
     var newexp;
     if (!message.member.hasPermission("BAN_MEMBERS")) return cmdresponse.levelcfg("NO_PERM_BAN_MEMBERS", "", client, message, args, guilddb);
         if (guilddb.config.hasOwnProperty('leveling') && guilddb.config.leveling == "on") {
-                
             if (args.length < 1) return cmdresponse.levelcfg("LEVELCFG_INVALID_CMD", "", client, message, args, guilddb);
             if (args[0] == "set") {
                 if (args.length < 3) return cmdresponse.levelcfg("LEVELCFG_SET_NO_ARGS", "", client, message, args, guilddb);
-                var userid = client.users.cache.get(args[1].replace(/[<@!>]/g, '')).id;
+                var useriddb = await db.findOne({"DBGuildID": message.guild.id, "profiles.userid": args[1]});
+                var userid = client.users.cache.get(args[1].replace(/[<@!>]/g, '')) ? client.users.cache.get(args[1].replace(/[<@!>]/g, '')).id : (useriddb ? args[1] : "");
                 if (!userid) return cmdresponse.levelcfg("LEVELCFG_INVALID_USER", args[1], client, message, args, guilddb);
                 if (args[2] == parseInt(args[2], 10) && args[2] >= 0) {
                     db.findOne({
@@ -36,7 +36,8 @@ module.exports.run = async (client, message, args, guilddb) => {
                 } else return cmdresponse.levelcfg("LEVELCFG_INVALID_NUMBER", args[2], client, message, args, guilddb);
             } else if (args[0] == "add") {
                 if (args.length < 3) return cmdresponse.levelcfg("LEVELCFG_ADD_NO_ARGS", "", client, message, args, guilddb);
-                var userid = client.users.cache.get(args[1].replace(/[<@!>]/g, '')).id;
+                var useriddb = await db.findOne({"DBGuildID": message.guild.id, "profiles.userid": args[1]});
+                var userid = client.users.cache.get(args[1].replace(/[<@!>]/g, '')) ? client.users.cache.get(args[1].replace(/[<@!>]/g, '')).id : (useriddb ? args[1] : "");
                 if (!userid) return cmdresponse.levelcfg("LEVELCFG_INVALID_USER", args[1], client, message, args, guilddb);
                 if (args[2] == parseInt(args[2], 10) && args[2] >= 0) {
                     db.findOne({
@@ -69,7 +70,8 @@ module.exports.run = async (client, message, args, guilddb) => {
                 } else return cmdresponse.levelcfg("LEVELCFG_INVALID_NUMBER", args[2], client, message, args, guilddb);
             } else if (args[0] == "rem") {
                 if (args.length < 3) return cmdresponse.levelcfg("LEVELCFG_REM_NO_ARGS", "", client, message, args, guilddb);
-                var userid = client.users.cache.get(args[1].replace(/[<@!>]/g, '')).id;
+                var useriddb = await db.findOne({"DBGuildID": message.guild.id, "profiles.userid": args[1]});
+                var userid = client.users.cache.get(args[1].replace(/[<@!>]/g, '')) ? client.users.cache.get(args[1].replace(/[<@!>]/g, '')).id : (useriddb ? args[1] : "");
                 if (!userid) return cmdresponse.levelcfg("LEVELCFG_INVALID_USER", args[1], client, message, args, guilddb);
                 if (args[2] == parseInt(args[2], 10) && args[2] >= 0) {
                     db.findOne({
@@ -102,19 +104,12 @@ module.exports.run = async (client, message, args, guilddb) => {
                         isreacted = 1;
                         if (r.emoji.name == "✅") {
                             msgreact.stop();
-                            /*db.findOne({
-                                "DBGuildID": message.guild.id,
-                                "profiles.experience": { $ne: false }
-                            }).then(data => {
-                                console.log(data)
-                            })*/
                             db.updateOne({ 
                                 "DBGuildID": message.guild.id
                             }, { $unset: {"profiles.$[profile].experience": { $exists: true }} },
                             { 
                                 "arrayFilters": [ { "profile.experience": { $exists: true } } ]
                             } );
-                            
                             msg.reactions.removeAll().then(() => {
                                 msg.edit(`${message.author} Pronto! Redefini a Experiência de Todos do servidor.`);
                             });
